@@ -23,8 +23,8 @@ jobs:
       run: |
         cd openwrt
         echo "src-link custom $GITHUB_WORKSPACE/luci-app-pppoe-reconn" >> feeds.conf.default
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
+        ./scripts/feeds update custom
+        ./scripts/feeds install -p custom luci-app-pppoe-reconn
 
     - name: Configure build
       run: |
