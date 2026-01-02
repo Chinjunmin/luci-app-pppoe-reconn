@@ -1,0 +1,20 @@
+{
+	"luci-app-pppoe-reconn": {
+		"description": "Allow LuCI to execute reconnect script and read logs",
+		"read": {
+			"file": {
+				"/etc/pppoe_ip_history.log": [ "read" ]
+			},
+			"uci": [ "pppoe_reconn" ]
+		},
+		"write": {
+			"file": {
+				"/etc/pppoe_ip_history.log": [ "write" ]
+			},
+			"uci": [ "pppoe_reconn" ],
+			"executable": {
+				"/usr/bin/pppoe_reconn.sh": [ "run" ]
+			}
+		}
+	}
+}

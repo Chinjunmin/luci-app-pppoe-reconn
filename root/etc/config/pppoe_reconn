@@ -1,0 +1,3 @@
+config config 'main'
+	option interface 'wan'
+	option delay '10'

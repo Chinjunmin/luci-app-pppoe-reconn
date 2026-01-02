@@ -1,0 +1,13 @@
+{
+	"admin/services/pppoe_reconn": {
+		"title": "PPPoE 重拨助手",
+		"action": {
+			"type": "view",
+			"path": "pppoe_reconn"
+		},
+		"order": 10,
+		"depends": {
+			"acl": [ "luci-app-pppoe-reconn" ]
+		}
+	}
+}

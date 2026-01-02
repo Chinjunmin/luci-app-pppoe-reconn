@@ -1,0 +1,34 @@
+name: Build IPK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gawk git libncurses5-dev gettext libssl-dev xsltproc wget
+          wget https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.xz
+          tar xf openwrt-sdk-*.tar.xz
+          mv openwrt-sdk-* sdk
+
+      - name: Build
+        run: |
+          cd sdk
+          mkdir -p package/luci-app-pppoe-reconn
+          cp -r ../Makefile ../htdocs ../root package/luci-app-pppoe-reconn/
+          make defconfig
+          make package/luci-app-pppoe-reconn/compile V=s
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: pppoe-reconn-ipk
+          path: sdk/bin/packages/*/base/luci-app-pppoe-reconn*.ipk
