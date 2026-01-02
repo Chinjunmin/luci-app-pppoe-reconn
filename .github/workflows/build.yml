@@ -15,7 +15,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gawk git libncurses5-dev gettext libssl-dev xsltproc wget
-          wget https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.xz
+          
+          # 自动获取最新 Snapshot SDK 的下载地址
+          DOWNLOAD_URL=$(curl -s https://downloads.openwrt.org/snapshots/targets/x86/64/ | grep -oE 'openwrt-sdk-x86-64_[^"]+\.tar\.xz' | head -n 1)
+          FULL_URL="https://downloads.openwrt.org/snapshots/targets/x86/64/$DOWNLOAD_URL"
+          
+          echo "正在下载 SDK: $FULL_URL"
+          wget "$FULL_URL"
           tar xf openwrt-sdk-*.tar.xz
           mv openwrt-sdk-* sdk
 
