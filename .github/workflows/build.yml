@@ -23,7 +23,6 @@ jobs:
       run: |
         cd openwrt
         echo "src-link custom $GITHUB_WORKSPACE/luci-app-pppoe-reconn" >> feeds.conf.default
-        echo "src-git luci https://github.com/openwrt/luci.git" >> feeds.conf.default
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
@@ -31,6 +30,7 @@ jobs:
       run: |
         cd openwrt
         make defconfig
+        echo "CONFIG_PACKAGE_luci-base=y" >> .config
         echo "CONFIG_PACKAGE_luci-app-pppoe-reconn=y" >> .config
         make defconfig
 
