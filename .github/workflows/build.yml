@@ -7,33 +7,52 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare SDK
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential gawk git libncurses5-dev gettext libssl-dev xsltproc wget
-          
-          # 自动获取最新 Snapshot SDK 的下载地址
-          DOWNLOAD_URL=$(curl -s https://downloads.openwrt.org/snapshots/targets/x86/64/ | grep -oE 'openwrt-sdk-x86-64_[^"]+\.tar\.xz' | head -n 1)
-          FULL_URL="https://downloads.openwrt.org/snapshots/targets/x86/64/$DOWNLOAD_URL"
-          
-          echo "正在下载 SDK: $FULL_URL"
-          wget "$FULL_URL"
-          tar xf openwrt-sdk-*.tar.xz
-          mv openwrt-sdk-* sdk
+          sudo apt-get install -y build-essential gawk git libncurses5-dev gettext libssl-dev xsltproc wget subversion
 
-      - name: Build
+      - name: Download OpenWrt SDK (snapshot x86/64)
         run: |
+          set -euxo pipefail
+          SDK_DIR=sdk
+          BASE_URL="https://downloads.openwrt.org/snapshots/targets/x86/64/"
+          FILE=$(curl -s "$BASE_URL" | grep -oE 'openwrt-sdk-x86-64_[^\"]+\.tar\.xz' | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "Could not find SDK file on $BASE_URL"
+            exit 1
+          fi
+          echo "Downloading $FILE"
+          wget "${BASE_URL}${FILE}"
+          tar xf "$FILE"
+          # move SDK dir to predictable name
+          mv openwrt-sdk-* "$SDK_DIR"
+
+      - name: Prepare package in SDK
+        run: |
+          set -euxo pipefail
           cd sdk
           mkdir -p package/luci-app-pppoe-reconn
           cp -r ../Makefile ../htdocs ../root package/luci-app-pppoe-reconn/
-          make defconfig
+          # update and install feeds if present (some SDKs require this)
+          if [ -f ./scripts/feeds ]; then
+            ./scripts/feeds update -a || true
+            ./scripts/feeds install -a || true
+          fi
+
+      - name: Build package
+        run: |
+          set -euxo pipefail
+          cd sdk
+          # compile the single package
           make package/luci-app-pppoe-reconn/compile V=s
 
-      - name: Upload
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pppoe-reconn-ipk
