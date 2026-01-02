@@ -19,12 +19,9 @@ jobs:
     - name: Clone OpenWrt
       run: git clone https://github.com/openwrt/openwrt.git openwrt --depth=1
 
-    - name: Update and install feeds
+    - name: Copy package to OpenWrt
       run: |
-        cd openwrt
-        echo "src-link custom $GITHUB_WORKSPACE/luci-app-pppoe-reconn" >> feeds.conf.default
-        ./scripts/feeds update custom
-        ./scripts/feeds install -p custom luci-app-pppoe-reconn
+        cp -r luci-app-pppoe-reconn openwrt/package/
 
     - name: Configure build
       run: |
