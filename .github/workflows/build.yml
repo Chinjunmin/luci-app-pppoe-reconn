@@ -22,15 +22,29 @@ jobs:
           set -euxo pipefail
           SDK_DIR=sdk
           BASE_URL="https://downloads.openwrt.org/snapshots/targets/x86/64/"
-          FILE=$(curl -s "$BASE_URL" | grep -oE 'openwrt-sdk-x86-64_[^\"]+\.tar\.xz' | head -n 1)
+          # 使用常见 User-Agent，避免简单的反爬限制
+          PAGE=$(curl -s -A "Mozilla/5.0" "$BASE_URL" || true)
+          FILE=$(printf "%s" "$PAGE" | grep -oE 'openwrt-sdk-x86-64_[^"]+\.tar\.xz' | head -n 1 || true)
           if [ -z "$FILE" ]; then
-            echo "Could not find SDK file on $BASE_URL"
+            echo "Snapshot SDK not found at $BASE_URL - printing a short page excerpt for debugging"
+            printf "%s\n" "$PAGE" | sed -n '1,160p'
+            echo "尝试从 releases 目录回退查找最新 SDK"
+            RELEASE=$(curl -s -A "Mozilla/5.0" https://downloads.openwrt.org/releases/ | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?/' | tr -d '/' | sort -V | tail -n1 || true)
+            if [ -n "$RELEASE" ]; then
+              ALT_URL="https://downloads.openwrt.org/releases/$RELEASE/targets/x86/64/"
+              echo "Checking $ALT_URL"
+              PAGE=$(curl -s -A "Mozilla/5.0" "$ALT_URL" || true)
+              FILE=$(printf "%s" "$PAGE" | grep -oE 'openwrt-sdk-x86-64_[^"]+\.tar\.xz' | head -n 1 || true)
+              BASE_URL="$ALT_URL"
+            fi
+          fi
+          if [ -z "$FILE" ]; then
+            echo "Could not find any openwrt-sdk-x86-64_*.tar.xz on snapshots or releases. Aborting."
             exit 1
           fi
-          echo "Downloading $FILE"
+          echo "Downloading $FILE from $BASE_URL"
           wget "${BASE_URL}${FILE}"
           tar xf "$FILE"
-          # move SDK dir to predictable name
           mv openwrt-sdk-* "$SDK_DIR"
 
       - name: Prepare package in SDK
