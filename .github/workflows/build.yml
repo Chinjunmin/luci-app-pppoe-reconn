@@ -36,6 +36,11 @@ jobs:
         cd openwrt
         make tools/install -j1
 
+    - name: Install toolchain
+      run: |
+        cd openwrt
+        make toolchain/install -j1
+
     - name: Build package
       run: |
         cd openwrt
