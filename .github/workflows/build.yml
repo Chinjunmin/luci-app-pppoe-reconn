@@ -37,7 +37,7 @@ jobs:
     - name: Build package
       run: |
         cd openwrt
-        make package/luci-app-pppoe-reconn/compile -j$(nproc)
+        make package/luci-app-pppoe-reconn/compile -j1 V=s
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
