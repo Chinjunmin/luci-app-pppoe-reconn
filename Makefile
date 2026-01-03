@@ -35,6 +35,9 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(CP) ./root/usr/share/luci/menu.d/*.json $(1)/usr/share/luci/menu.d/
 	
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(CP) ./root/usr/lib/lua/luci/controller/*.lua $(1)/usr/lib/lua/luci/controller/
+	
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(CP) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
 
