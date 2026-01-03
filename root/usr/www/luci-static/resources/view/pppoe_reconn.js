@@ -77,7 +77,7 @@ return L.view.extend({
                         'class': 'cbi-button cbi-button-apply',
                         'value': '立即断开并重拨',
                         'click': L.ui.createHandlerFn(this, function() {
-                            L.fs.exec('/usr/bin/pppoe_reconn.sh').then(function() {
+                            L.fs.exec('/usr/bin/pppoe_reconn.sh', [], {stdout: true,stderr: true}).then(function() {
                                 L.ui.addNotification(null, '指令已发送！请观察下方日志。', 'info');
                             });
                         })

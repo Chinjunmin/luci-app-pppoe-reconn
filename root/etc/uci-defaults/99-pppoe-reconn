@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # 创建日志文件并开放写入权限
-touch /etc/pppoe_ip_history.log
-chmod 666 /etc/pppoe_ip_history.log
+touch /tmp/pppoe_ip_history.log
+chmod 666 /tmp/pppoe_ip_history.log
 
 # 如果 UCI 配置不存在，则初始化默认值
 if [ -z "$(uci get pppoe_reconn.main 2>/dev/null)" ]; then
     uci set pppoe_reconn.main=config
     uci set pppoe_reconn.main.interface='wan'
-    uci set pppoe_reconn.main.delay='10'
+    uci set pppoe_reconn.main.delay='180'
     uci commit pppoe_reconn
 fi
 

@@ -33,16 +33,13 @@ define Package/$(PKG_NAME)/install
 	
 	# 安装菜单定义、权限 ACL 和前端 JS 视图
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(CP) ./root/usr/share/luci/menu.d/*.json $(1)/usr/share/luci/menu.d/
-	
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(CP) ./root/usr/lib/lua/luci/controller/*.lua $(1)/usr/lib/lua/luci/controller/
+	$(INSTALL_DATA) ./root/usr/share/luci/menu.d/*.json $(1)/usr/share/luci/menu.d/
 	
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(CP) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
+	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
 
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view
-	$(CP) ./htdocs/luci-static/resources/view/*.js $(1)/www/luci-static/resources/view/
+	$(INSTALL_DATA) ./root/usr/www/luci-static/resources/view/*.js $(1)/www/luci-static/resources/view/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
