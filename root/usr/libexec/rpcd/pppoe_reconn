@@ -1,0 +1,9 @@
+#!/bin/sh
+
+case "$1" in
+    reconnect)
+        /usr/bin/pppoe_reconn.sh
+        ;;
+esac
+
+exit 0

@@ -12,9 +12,9 @@
 				"/tmp/pppoe_ip_history.log": [ "write" ]
 			},
 			"uci": [ "pppoe_reconn" ],
-			"executable": {
-				"/usr/bin/pppoe_reconn.sh": [ "exec" ]
-			}
+    		"ubus": {
+    		    "pppoe_reconn": [ "reconnect" ]
+		    }
 		}
 	}
 }

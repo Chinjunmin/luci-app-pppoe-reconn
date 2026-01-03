@@ -76,11 +76,13 @@ return L.view.extend({
                         'type': 'button',
                         'class': 'cbi-button cbi-button-apply',
                         'value': '立即断开并重拨',
-                        'click': L.ui.createHandlerFn(this, function() {
-                            L.fs.exec('/usr/bin/pppoe_reconn.sh', [], {stdout: true,stderr: true}).then(function() {
+                        'click': rpc.declare({
+                                object: 'pppoe_reconn',
+                                method: 'reconnect',
+                                params: [],
+                                expect: {}}).then(function() {
                                 L.ui.addNotification(null, '指令已发送！请观察下方日志。', 'info');
-                            });
-                        })
+                            })
                     })
                 ])
             ]),
