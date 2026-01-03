@@ -1,8 +1,51 @@
 #!/bin/sh
+# rpcd plugin for luci-app-pppoe-reconn
+# Provides ubus method: pppoe_reconn.reconnect
+# With lock to prevent concurrent execution
+
+LOCK_FILE="/tmp/pppoe_reconn.lock"
+SCRIPT="/usr/bin/pppoe_reconn.sh"
 
 case "$1" in
-    reconnect)
-        /usr/bin/pppoe_reconn.sh
+    list)
+        # 告诉 rpcd：我提供哪些方法
+        cat <<EOF
+{
+    "reconnect": {
+        "description": "Disconnect PPPoE and reconnect after delay",
+        "params": [],
+        "returns": {
+            "status": "string"
+        }
+    }
+}
+EOF
+        ;;
+
+    call)
+        METHOD="$2"
+
+        case "$METHOD" in
+            reconnect)
+                # 如果已有锁，直接返回 busy
+                if [ -f "$LOCK_FILE" ]; then
+                    echo '{ "status": "busy" }'
+                    exit 0
+                fi
+
+                # 上锁
+                touch "$LOCK_FILE"
+
+                # 后台执行真正的重拨脚本
+                (
+                    "$SCRIPT" >/dev/null 2>&1
+                    rm -f "$LOCK_FILE"
+                ) &
+
+                # 立刻返回，避免 ubus 超时
+                echo '{ "status": "started" }'
+                ;;
+        esac
         ;;
 esac
 
