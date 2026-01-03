@@ -19,8 +19,8 @@ jobs:
     - name: Download OpenWrt SDK
       run: |
         wget https://downloads.openwrt.org/releases/23.05.3/targets/x86/64/openwrt-sdk-23.05.3-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-        mkdir openwrt
-        tar -xf openwrt-sdk.tar.xz -C openwrt --strip-components=1
+        mkdir -p openwrt
+        tar -xf openwrt-sdk-23.05.3-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz -C openwrt --strip-components=1
 
     - name: Copy package to OpenWrt
       run: |
