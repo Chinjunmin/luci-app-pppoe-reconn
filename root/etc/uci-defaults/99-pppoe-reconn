@@ -14,4 +14,9 @@ fi
 
 # 清除 LuCI 缓存以显示新菜单
 rm -f /tmp/luci-indexcache
+
+# 重启相关服务以应用更改
+/etc/init.d/rpcd restart
+/etc/init.d/uhttpd restart
+
 exit 0

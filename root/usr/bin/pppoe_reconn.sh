@@ -2,7 +2,7 @@
 
 # 从 UCI 获取配置，如果为空则设为默认值
 INTERFACE=$(uci get pppoe_reconn.main.interface 2>/dev/null || echo "wan")
-DELAY=$(uci get pppoe_reconn.main.delay 2>/dev/null || echo "10")
+DELAY=$(uci get pppoe_reconn.main.delay 2>/dev/null || echo "180")
 LOG_FILE="/etc/pppoe_ip_history.log"
 
 # 获取旧 IP
