@@ -16,8 +16,11 @@ jobs:
       with:
         path: luci-app-pppoe-reconn
 
-    - name: Clone OpenWrt
-      run: git clone https://github.com/openwrt/openwrt.git openwrt --depth=1
+    - name: Download OpenWrt SDK
+      run: |
+        wget https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz -O openwrt-sdk.tar.xz
+        mkdir openwrt
+        tar -xf openwrt-sdk.tar.xz -C openwrt --strip-components=1
 
     - name: Copy package to OpenWrt
       run: |
@@ -26,28 +29,18 @@ jobs:
     - name: Configure build
       run: |
         cd openwrt
-        make defconfig
         echo "CONFIG_PACKAGE_luci-base=y" >> .config
         echo "CONFIG_PACKAGE_luci-app-pppoe-reconn=y" >> .config
         make defconfig
 
-    - name: Install host tools
-      run: |
-        cd openwrt
-        make tools/install -j1
-
-    - name: Install toolchain
-      run: |
-        cd openwrt
-        make toolchain/install -j1
-
     - name: Build package
       run: |
         cd openwrt
-        make package/luci-app-pppoe-reconn/compile -j1 V=s
+        make package/luci-app-pppoe-reconn/compile -j$(nproc) V=s
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: luci-app-pppoe-reconn-ipk
-        path: openwrt/bin/packages/*/custom/luci-app-pppoe-reconn*.ipk
+        path: openwrt/bin/packages/*/packages/luci-app-pppoe-reconn*.ipk
+        if-no-files-found: warn
