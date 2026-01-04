@@ -10,12 +10,26 @@
 			"acl": [ "luci-app-pppoe-reconn" ]
 		}
 	},
+	"admin/services/pppoe_reconn/log": {
+		"title": "操作日志",
+		"order": 10,
+		"action": {
+		"type": "view",
+		"path": "pppoe_reconn/log",
+		"depends": {
+			"acl": [ "luci-app-pppoe-reconn" ]
+		}
+		}
+	},
   	"admin/services/pppoe_reconn/settings": {
     	"title": "设置",
     	"order": 20,
     	"action": {
       		"type": "view",
-      		"path": "pppoe_reconn/settings"
+      		"path": "pppoe_reconn/settings",
+		"depends": {
+			"acl": [ "luci-app-pppoe-reconn" ]
+		}
     	}
   	}
 }
