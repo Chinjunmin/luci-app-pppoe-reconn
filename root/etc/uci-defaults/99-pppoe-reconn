@@ -16,7 +16,7 @@ fi
 rm -f /tmp/luci-indexcache
 
 # 重启相关服务以应用更改
-/etc/init.d/rpcd restart
-/etc/init.d/uhttpd restart
+#/etc/init.d/rpcd restart
+#/etc/init.d/uhttpd restart
 
 exit 0

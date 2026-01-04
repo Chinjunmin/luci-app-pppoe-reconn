@@ -13,7 +13,7 @@
 			},
 			"uci": [ "pppoe_reconn" ],
     		"ubus": {
-    		    "pppoe_reconn": [ "reconnect" ]
+    		    "pppoe_reconn": [ "reconnect", "clear_log" ]
 		    }
 		}
 	}
