@@ -2,14 +2,22 @@ name: Build OpenWrt Package
 
 on:
   workflow_dispatch:
-  #push:
-  #  branches: [ main, master ]
-  #pull_request:
-  #  branches: [ main, master ]
+  
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      OPENWRT_VERSION: 24.10.0
+      TARGET: x86
+      SUBTARGET: 64
+      SDK_NAME: openwrt-sdk-24.10.0-x86-64_gcc-13.3.0_musl.Linux-x86_64
+      SDK_DIR: openwrt
 
     steps:
     - name: Checkout package
@@ -17,31 +25,44 @@ jobs:
       with:
         path: luci-app-pppoe-reconn
 
-    - name: Download OpenWrt SDK
+    # ✅ 关键新增：SDK 缓存
+    - name: Cache OpenWrt SDK
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.SDK_DIR }}
+        key: sdk-${{ env.SDK_NAME }}
+
+    # ✅ 只有 cache 不存在才下载
+    - name: Download OpenWrt SDK (if not cached)
       run: |
-        wget https://downloads.openwrt.org/releases/24.10.0/targets/x86/64/openwrt-sdk-24.10.0-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
-        mkdir -p openwrt
-        tar -xf openwrt-sdk-24.10.0-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst -C openwrt --strip-components=1
+        if [ ! -d "${SDK_DIR}/scripts" ]; then
+          echo "Downloading OpenWrt SDK..."
+          wget https://downloads.openwrt.org/releases/${OPENWRT_VERSION}/targets/${TARGET}/${SUBTARGET}/${SDK_NAME}.tar.zst
+          mkdir -p ${SDK_DIR}
+          tar --use-compress-program=unzstd -xf ${SDK_NAME}.tar.zst -C ${SDK_DIR} --strip-components=1
+        else
+          echo "Using cached OpenWrt SDK"
+        fi
 
     - name: Copy package to OpenWrt
       run: |
-        cp -r luci-app-pppoe-reconn openwrt/package/
+        cp -r luci-app-pppoe-reconn ${SDK_DIR}/package/
 
     - name: Configure build
       run: |
-        cd openwrt
+        cd ${SDK_DIR}
         echo "CONFIG_PACKAGE_luci-base=y" >> .config
         echo "CONFIG_PACKAGE_luci-app-pppoe-reconn=y" >> .config
         make defconfig
 
     - name: Build package
       run: |
-        cd openwrt
+        cd ${SDK_DIR}
         make package/luci-app-pppoe-reconn/compile -j$(nproc) V=s
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: luci-app-pppoe-reconn-${{ github.run_id }}-${{ github.run_number }}
-        path: openwrt/bin/packages/x86_64/base/luci-app-pppoe-reconn*.ipk
+        path: ${SDK_DIR}/bin/packages/x86_64/base/luci-app-pppoe-reconn*.ipk
         if-no-files-found: warn
