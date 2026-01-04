@@ -42,7 +42,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./root/usr/libexec/rpcd/pppoe_reconn $(1)/usr/libexec/rpcd/
 
 
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/pppoe_reconn
 	$(INSTALL_DATA) ./root/usr/www/luci-static/resources/view/pppoe_reconn/*.js $(1)/www/luci-static/resources/view/pppoe_reconn/
 endef
 
