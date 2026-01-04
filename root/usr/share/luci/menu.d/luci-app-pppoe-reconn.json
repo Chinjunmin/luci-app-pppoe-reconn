@@ -3,7 +3,7 @@
 		"title": "PPPoE 重拨助手",
 		"action": {
 			"type": "view",
-			"path": "pppoe_reconn/index"
+			"path": "pppoe_reconn/log"
 		},
 		"order": 10,
 		"depends": {

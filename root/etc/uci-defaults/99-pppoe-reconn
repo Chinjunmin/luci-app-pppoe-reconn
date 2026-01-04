@@ -15,8 +15,20 @@ fi
 # 清除 LuCI 缓存以显示新菜单
 rm -f /tmp/luci-indexcache
 
+# 1. 清理 rpcd ACL 缓存
+rm -rf /tmp/acl-*
+
+# 2. 清理 LuCI runtime cache
+rm -rf /tmp/luci-*
+
+# 3. 清理 LuCI JS 编译缓存（最关键）
+rm -rf /www/luci-static/resources/compiled/*
+
+# 4. 重启 rpcd（让 ACL 立即生效）
+/etc/init.d/rpcd restart >/dev/null 2>&1
+
 # 重启相关服务以应用更改
 #/etc/init.d/rpcd restart
-/etc/init.d/uhttpd restart
+#/etc/init.d/uhttpd restart
 
 exit 0
