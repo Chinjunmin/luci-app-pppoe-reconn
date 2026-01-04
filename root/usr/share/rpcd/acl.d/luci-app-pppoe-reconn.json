@@ -3,13 +3,13 @@
 		"description": "Allow LuCI to execute reconnect script and read logs",
 		"read": {
 			"file": {
-				"/tmp/pppoe_ip_history.log": [ "read" ]
+				"/tmp/pppoe_reconn.log": [ "read" ]
 			},
 			"uci": [ "pppoe_reconn" ]
 		},
 		"write": {
 			"file": {
-				"/tmp/pppoe_ip_history.log": [ "write" ]
+				"/tmp/pppoe_reconn.log": [ "write" ]
 			},
 			"uci": [ "pppoe_reconn" ],
     		"ubus": {

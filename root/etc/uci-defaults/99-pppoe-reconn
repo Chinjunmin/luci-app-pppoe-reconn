@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # 创建日志文件并开放写入权限
-touch /tmp/pppoe_ip_history.log
-chmod 666 /tmp/pppoe_ip_history.log
+touch /tmp/pppoe_reconn.log
+chmod 666 /tmp/pppoe_reconn.log
 
 # 如果 UCI 配置不存在，则初始化默认值
 if [ -z "$(uci get pppoe_reconn.main 2>/dev/null)" ]; then
@@ -17,6 +17,6 @@ rm -f /tmp/luci-indexcache
 
 # 重启相关服务以应用更改
 #/etc/init.d/rpcd restart
-#/etc/init.d/uhttpd restart
+/etc/init.d/uhttpd restart
 
 exit 0
