@@ -11,6 +11,13 @@ var callReconnect = rpc.declare({
     params: [],
     expect: {}
 });
+var callClearLog = rpc.declare({
+    object: 'pppoe_reconn',
+    method: 'clear_log',
+    params: [],
+    expect: {}
+});
+
 
 return view.extend({
     load: function () {
@@ -48,39 +55,6 @@ return view.extend({
             ),
 
             E('fieldset', { 'class': 'cbi-section' }, [
-                E('legend', {}, '设置'),
-                E('div', { 'class': 'cbi-value' }, [
-                    E('label', { 'class': 'cbi-value-title' }, '断开等待时长 (秒)'),
-                    E('div', { 'class': 'cbi-value-field' }, [
-                        E('input', {
-                            'type': 'text',
-                            'class': 'cbi-input-text',
-                            'value': delay,
-                            'id': 'delay_input'
-                        }),
-                        E('div', { 'class': 'cbi-value-description' },
-                            '建议设置 180 秒以上，确保运营商机房识别下线。'
-                        )
-                    ])
-                ]),
-                E('div', { 'class': 'cbi-section-actions' }, [
-                    E('input', {
-                        'type': 'button',
-                        'class': 'cbi-button cbi-button-save',
-                        'value': '保存设置',
-                        'click': function () {
-                            var newDelay = document.getElementById('delay_input').value;
-                            uci.set('pppoe_reconn', 'main', 'delay', newDelay);
-                            uci.save().then(function () {
-                                ui.addNotification(null, '设置已保存', 'info');
-                            });
-                        }
-                    })
-                ])
-            ]),
-
-            E('fieldset', { 'class': 'cbi-section' }, [
-                E('legend', {}, '手动操作'),
                 E('div', { 'class': 'cbi-value' }, [
                     E('input', {
                         'type': 'button',
@@ -90,14 +64,13 @@ return view.extend({
                             ui.addNotification(null, '正在发送重拨指令…', 'info');
 
                             callReconnect().then(function (res) {
-                                if (res && res.success) {
+                                if (res && res.status === 'started') {
                                     ui.addNotification(null, '重拨脚本已执行', 'info');
-                                } else {
-                                    ui.addNotification(
-                                        null,
-                                        '执行失败：' + (res && res.message ? res.message : '未知错误'),
-                                        'danger'
-                                    );
+                                } else if(res && res.status === 'busy') {
+                                    ui.addNotification(null, '已有重拨任务在运行中，请稍后再试', 'warning');
+                                }
+                                else {
+                                    ui.addNotification(null,'执行失败：' + (res && res.message ? res.message : '未知错误'),'danger');
                                 }
                             }).catch(function (err) {
                                 ui.addNotification(
@@ -113,6 +86,25 @@ return view.extend({
 
             E('fieldset', { 'class': 'cbi-section' }, [
                 E('legend', {}, '运行记录'),
+
+                E('div', { 'style': 'margin-bottom:8px;' }, [
+                    E('button', {
+                        'class': 'cbi-button cbi-button-remove',
+                        'click': function () {
+                            callClearLog().then(function (res) {
+                                if (res && res.status === 'cleared') {
+                                    ui.addNotification(null, '日志已清空', 'info');
+                                    loadLog();
+                                } else {
+                                    ui.addNotification(null, '清空日志失败', 'danger');
+                                }
+                            }).catch(function (err) {
+                                ui.addNotification(null, 'RPC 调用失败：' + err, 'danger');
+                            });
+                        }
+                    }, _('清空日志'))
+                ]),
+
                 E('div', { 'class': 'cbi-value' }, [
                     E('textarea', {
                         'id': 'log_content',
@@ -121,6 +113,7 @@ return view.extend({
                     }, '正在载入日志...')
                 ])
             ])
+
         ]);
     },
 

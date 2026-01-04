@@ -5,14 +5,22 @@
 
 LOCK_FILE="/tmp/pppoe_reconn.lock"
 SCRIPT="/usr/bin/pppoe_reconn.sh"
+LOG_FILE="/tmp/pppoe_reconn.log"
 
 case "$1" in
     list)
-        # 告诉 rpcd：我提供哪些方法
         cat <<EOF
 {
     "reconnect": {
         "description": "Disconnect PPPoE and reconnect after delay",
+        "params": [],
+        "returns": {
+            "success": "boolean",
+            "status": "string"
+        }
+    },
+    "clear_log": {
+        "description": "Clear pppoe reconnect log",
         "params": [],
         "returns": {
             "status": "string"
@@ -44,6 +52,13 @@ EOF
 
                 # 立刻返回，避免 ubus 超时
                 echo '{ "status": "started" }'
+                ;;
+
+            # ===== 新增：清理日志 =====
+            clear_log)
+                # 不管日志在不在，都保证命令安全
+                : > "$LOG_FILE"
+                echo '{ "status": "cleared" }'
                 ;;
         esac
         ;;

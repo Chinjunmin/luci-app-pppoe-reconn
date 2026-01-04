@@ -8,7 +8,7 @@ chmod 666 /tmp/pppoe_ip_history.log
 if [ -z "$(uci get pppoe_reconn.main 2>/dev/null)" ]; then
     uci set pppoe_reconn.main=config
     uci set pppoe_reconn.main.interface='wan'
-    uci set pppoe_reconn.main.delay='180'
+    uci set pppoe_reconn.main.delay='10'
     uci commit pppoe_reconn
 fi
 

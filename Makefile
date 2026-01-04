@@ -43,7 +43,7 @@ define Package/$(PKG_NAME)/install
 
 
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view
-	$(INSTALL_DATA) ./root/usr/www/luci-static/resources/view/*.js $(1)/www/luci-static/resources/view/
+	$(INSTALL_DATA) ./root/usr/www/luci-static/resources/view/pppoe_reconn/*.js $(1)/www/luci-static/resources/view/pppoe_reconn/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
