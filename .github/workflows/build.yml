@@ -46,7 +46,10 @@ jobs:
 
     - name: Copy package to OpenWrt
       run: |
-        cp -r luci-app-pppoe-reconn ${SDK_DIR}/package/
+        rm -rf ${SDK_DIR}/package/luci-app-pppoe-reconn
+        mkdir -p ${SDK_DIR}/package/luci-app-pppoe-reconn
+        tar -C luci-app-pppoe-reconn --exclude=.git -cf - . \
+          | tar -C ${SDK_DIR}/package/luci-app-pppoe-reconn -xf -
 
     - name: Configure build
       run: |
@@ -60,9 +63,16 @@ jobs:
         cd ${SDK_DIR}
         make package/luci-app-pppoe-reconn/compile -j$(nproc) V=s
 
-    - name: Upload build artifacts
+    - name: Collect IPK
+      run: |
+        mkdir -p artifacts
+        find ${SDK_DIR}/bin/packages \
+          -name "luci-app-pppoe-reconn*.ipk" \
+          -exec cp {} artifacts/ \;
+
+    - name: Upload IPK
       uses: actions/upload-artifact@v4
       with:
-        name: luci-app-pppoe-reconn-${{ github.run_id }}-${{ github.run_number }}
-        path: ${SDK_DIR}/bin/packages/x86_64/base/luci-app-pppoe-reconn*.ipk
-        if-no-files-found: warn
+        name: luci-app-pppoe-reconn-${{ github.run_number }}
+        path: artifacts/*.ipk
+        if-no-files-found: error
